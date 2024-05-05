@@ -15,6 +15,6 @@ typedef struct PathNode {
   LinkedList neighbors;
 } PathNode;
 
-void runAStar();
+void aStar();
 
 #endif
