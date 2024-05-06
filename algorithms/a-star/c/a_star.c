@@ -1,3 +1,14 @@
+#ifdef _WINDOWS
+#include <windows.h>
+#else
+#define _POSIX_C_SOURCE 200112L // for nanosleep from time.h
+#define Sleep(x) \
+  ({ \
+    struct timespec ts = {.tv_sec = 0, .tv_nsec = (x)*1000000}; \
+    nanosleep(&ts, NULL); \
+  })
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <float.h>
@@ -10,6 +21,9 @@
 #include "a_star.h"
 
 #define CLOCKS_PER_MILLI (CLOCKS_PER_SEC / 1000)
+
+#define PRINT_EXPLORATION
+#define DELAY 3
 
 const char START = 'S';
 const char GOAL = 'G';
@@ -55,8 +69,15 @@ static float calcG(PathNode *node, PathNode *prev) {
   return cost + prev->g;
 }
 
-static int heuristic(PathNode *node, PathNode *goal) {
-  return abs(node->x - goal->x) + abs(node->y - goal->y);
+static float heuristic(PathNode *node, PathNode *goal) {
+  // manhatten distance
+  // return abs(node->x - goal->x) + abs(node->y - goal->y);
+
+  int dx = abs(node->x - goal->x);
+  int dy = abs(node->y - goal->y);
+  // octile distance:
+  // cost * (dx + dy) + (cost_diag - 2 * cost) * min(dx, dy)
+  return (dx + dy) - 0.41 * (dx < dy ? dx : dy);
 }
 
 static void maybeAddNeighbor(LinkedList *neighbors, PathNode *neighbor) {
@@ -117,6 +138,20 @@ void aStar() {
     }
   }
 
+  printf("\033[2J");
+  printf("\033[%d;%dH", 1, 1);
+  for(int i = 0; i < height; ++i) {
+    printf("%s\n", field[i]);
+  }
+  printf("\033[%d;%dH", height + 1, 1);
+  printf("S: start; G: goal; ");
+#ifdef PRINT_EXPLORATION
+  printf("\033[48;2;123;123;123m \033[0m: fully explored nodes; ");
+  printf("\033[48;2;150;150;150m \033[0m: partially explored nodes; ");
+#endif
+  printf("\033[48;2;65;152;10m \033[0m: shortest path found\n");
+
+  int counter = 0;
   double timeStart = millis();
 
   LinkedList openList = {.head = NULL};
@@ -130,6 +165,10 @@ void aStar() {
     }
 
     for (LinkedListNode *neighbor = current->neighbors.head; neighbor != NULL; neighbor = neighbor->next) {
+#ifdef DELAY
+      Sleep(DELAY);
+#endif
+      counter++;
       PathNode *node = (PathNode*)neighbor->data;
       if (setContains(&closedSet, &node->id)) {
         continue;
@@ -147,32 +186,24 @@ void aStar() {
 
       if (!inOpenList) {
         llPushFront(&openList, node);
+#ifdef PRINT_EXPLORATION
+        printf("\033[%d;%dH", node->y + 1, node->x + 1);
+        printf("\033[48;2;150;150;150m%c\033[0m", field[node->y][node->x]);
+        fflush(stdout);
+#endif
       }
     }
 
     insertionSort(&openList, smallestF);
     setAdd(&closedSet, &current->id);
+#ifdef PRINT_EXPLORATION
+    printf("\033[%d;%dH", current->y + 1, current->x + 1);
+    printf("\033[48;2;123;123;123m%c\033[0m", field[current->y][current->x]);
+    fflush(stdout);
+#endif
   }
 
   double timeEnd = millis();
-
-  printf("\033[2J");
-  printf("\033[%d;%dH", 1, 1);
-  for(int i = 0; i < height; ++i) {
-    printf("%s\n", field[i]);
-  }
-
-  for (int y = 0; y < height; ++y) {
-    for (int x = 0; x < width; ++x) {
-      if (setContains(&closedSet, &nodes[y][x].id)) {
-        printf("\033[%d;%dH", y + 1, x + 1);
-        printf("\033[48;2;123;123;123m%c\033[0m", field[y][x]);
-      } else if (llContains(&openList, &nodes[y][x])) {
-        printf("\033[%d;%dH", y + 1, x + 1);
-        printf("\033[48;2;150;150;150m%c\033[0m", field[y][x]);
-      }
-    }
-  }
 
   freeList(&openList);
   freeSet(&closedSet);
@@ -183,11 +214,9 @@ void aStar() {
     printf("\033[48;2;65;152;10m%c\033[0m", field[path->y][path->x]);
     path = path->pred;
   }
+  printf("\033[%d;%dH", height + 2, 1);
 
-  printf("\033[%d;%dH", height + 1, 1);
-  printf("path finding took: %fms\n", timeEnd - timeStart);
-  printf("S: start; G: goal; ");
-  printf("\033[48;2;65;152;10m \033[0m: shortest path; ");
-  printf("\033[48;2;123;123;123m \033[0m: fully explored nodes; ");
-  printf("\033[48;2;150;150;150m \033[0m: partially explored nodes\n");
+#if !defined PRINT_EXPLORATION && !defined DELAY
+  printf("path finding took: %.3fms\n", timeEnd - timeStart);
+#endif
 }
