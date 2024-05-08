@@ -10,18 +10,18 @@
 
 typedef struct {
   uint32_t *value;
-} SetValue;
+} PtrSetValue;
 
 typedef struct {
   int count;
   int capacity;
-  SetValue *entries;
-} IntSet;
+  PtrSetValue *entries;
+} PtrSet;
 
-void initSet(IntSet *set);
-void freeSet(IntSet *set);
-bool setContains(IntSet *set, uint32_t *value);
-bool setAdd(IntSet *set, uint32_t *value);
-bool setDelete(IntSet *set, uint32_t *value);
+void initSet(PtrSet *set);
+void freeSet(PtrSet *set);
+bool setContains(PtrSet *set, uint32_t *value);
+bool setAdd(PtrSet *set, uint32_t *value);
+bool setDelete(PtrSet *set, uint32_t *value);
 
 #endif

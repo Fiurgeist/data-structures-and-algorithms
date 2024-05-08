@@ -1,4 +1,4 @@
 ./algorithms/a-star/c/*.c
 ./data-structures/linked-list/c/linked_list.c
-./data-structures/hash-set/c/set.c
+./data-structures/hash-set/c/int_set.c
 ./algorithms/sort/insertion/c/insertion.c

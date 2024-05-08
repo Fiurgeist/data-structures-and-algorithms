@@ -6,22 +6,22 @@
 // #define TOMBSTONE_VAL       ((uint64_t)(QNAN | 1))
 // #define IS_TOMBSTONE(value) ((uint64_t)(uintptr_t)(value) == TOMBSTONE_VAL)
 
-void initSet(IntSet *set) {
+void initSet(PtrSet *set) {
   set->count = 0;
   set->capacity = 0;
   set->entries = NULL;
 }
 
-void freeSet(IntSet *set) {
+void freeSet(PtrSet *set) {
   free(set->entries);
   initSet(set);
 }
 
-static SetValue* findEntry(SetValue *values, int capacity, uint32_t value) {
-  SetValue *tombstone = NULL;
+static PtrSetValue* findEntry(PtrSetValue *values, int capacity, uint32_t value) {
+  PtrSetValue *tombstone = NULL;
   uint32_t index = value & (capacity - 1);
   for (;;) {
-    SetValue *entry = &values[index];
+    PtrSetValue *entry = &values[index];
     if (entry->value == NULL) {
       return tombstone != NULL ? tombstone : entry;
     } else if (IS_TOMBSTONE(entry->value)) {
@@ -36,20 +36,20 @@ static SetValue* findEntry(SetValue *values, int capacity, uint32_t value) {
   }
 }
 
-static void adjustCapacity(IntSet *set, int capacity) {
-  SetValue *entries = ALLOCATE(SetValue, capacity);
+static void adjustCapacity(PtrSet *set, int capacity) {
+  PtrSetValue *entries = ALLOCATE(PtrSetValue, capacity);
   for (int i = 0; i < capacity; i++) {
     entries[i].value = NULL;
   }
 
   set->count = 0;
   for (int i = 0; i < set->capacity; ++i) {
-    SetValue *entry = &set->entries[i];
-    if (entry->value == NULL) {
+    PtrSetValue *entry = &set->entries[i];
+    if (entry->value == NULL || IS_TOMBSTONE(entry->value)) {
       continue;
     }
 
-    SetValue *dest = findEntry(entries, capacity, *entry->value);
+    PtrSetValue *dest = findEntry(entries, capacity, *entry->value);
     dest->value = entry->value;
     set->count++;
   }
@@ -59,12 +59,12 @@ static void adjustCapacity(IntSet *set, int capacity) {
   set->capacity = capacity;
 }
 
-bool setContains(IntSet *set, uint32_t *value) {
+bool setContains(PtrSet *set, uint32_t *value) {
   if (set->count == 0) {
     return false;
   }
 
-  SetValue *entry = findEntry(set->entries, set->capacity, *value);
+  PtrSetValue *entry = findEntry(set->entries, set->capacity, *value);
   if (entry->value == NULL || IS_TOMBSTONE(entry->value)) {
     return false;
   }
@@ -72,13 +72,13 @@ bool setContains(IntSet *set, uint32_t *value) {
   return true;
 }
 
-bool setAdd(IntSet *set, uint32_t *value) {
+bool setAdd(PtrSet *set, uint32_t *value) {
   if (set->count + 1 > set->capacity * SET_MAX_LOAD) {
     int capacity = GROW_CAPACITY(set->capacity);
     adjustCapacity(set, capacity);
   }
 
-  SetValue *entry = findEntry(set->entries, set->capacity, *value);
+  PtrSetValue *entry = findEntry(set->entries, set->capacity, *value);
 
   bool isNew = entry->value == NULL;
   if (isNew) {
@@ -89,12 +89,12 @@ bool setAdd(IntSet *set, uint32_t *value) {
   return isNew;
 }
 
-bool setDelete(IntSet *set, uint32_t *value) {
+bool setDelete(PtrSet *set, uint32_t *value) {
   if (set->count == 0) {
     return false;
   }
 
-  SetValue *entry = findEntry(set->entries, set->capacity, *value);
+  PtrSetValue *entry = findEntry(set->entries, set->capacity, *value);
   if (entry->value == NULL) {
     return false;
   }

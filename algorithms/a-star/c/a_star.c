@@ -16,7 +16,7 @@
 #include <math.h>
 #include <time.h>
 
-#include "../../../data-structures/hash-set/c/set.h"
+#include "../../../data-structures/hash-set/c/int_set.h"
 #include "../../sort/insertion/c/insertion.h"
 #include "a_star.h"
 
@@ -155,7 +155,9 @@ void aStar() {
   double timeStart = millis();
 
   LinkedList openList = {.head = NULL};
-  IntSet closedSet = {.entries = NULL, .capacity = 0, .count = 0};
+  IntSet closedSet;
+  initIntSet(&closedSet);
+
   llPushFront(&openList, start);
 
   while (openList.head != NULL) {
@@ -170,7 +172,7 @@ void aStar() {
 #endif
       counter++;
       PathNode *node = (PathNode*)neighbor->data;
-      if (setContains(&closedSet, &node->id)) {
+      if (setContainsInt(&closedSet, node->id)) {
         continue;
       }
 
@@ -195,7 +197,7 @@ void aStar() {
     }
 
     insertionSort(&openList, smallestF);
-    setAdd(&closedSet, &current->id);
+    setAddInt(&closedSet, current->id);
 #ifdef PRINT_EXPLORATION
     printf("\033[%d;%dH", current->y + 1, current->x + 1);
     printf("\033[48;2;123;123;123m%c\033[0m", field[current->y][current->x]);
@@ -206,7 +208,7 @@ void aStar() {
   double timeEnd = millis();
 
   freeList(&openList);
-  freeSet(&closedSet);
+  freeIntSet(&closedSet);
 
   PathNode *path = goal;
   while (path != NULL) {
