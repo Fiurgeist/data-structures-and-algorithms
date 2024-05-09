@@ -19,9 +19,9 @@ void freeIntSet(IntSet *set) {
   initIntSet(set);
 }
 
-static uint32_t findEntry(IntSetValue *entries, char *states, int capacity, IntSetValue value) {
-  uint32_t *tombstone = NULL;
-  uint32_t index = value & (capacity - 1);
+static size_t findEntry(IntSetValue *entries, char *states, int capacity, IntSetValue value) {
+  size_t *tombstone = NULL;
+  size_t index = value & (capacity - 1);
   for (;;) {
     char state = states[index];
     if (state == tombstoneState) {
@@ -50,7 +50,7 @@ static void adjustCapacity(IntSet *set, int capacity) {
     }
 
     IntSetValue entry = set->entries[i];
-    uint32_t index = findEntry(entries, states, capacity, entry);
+    size_t index = findEntry(entries, states, capacity, entry);
     entries[index] = entry;
     states[index] = valueState;
     set->count++;
@@ -68,7 +68,7 @@ bool setContainsInt(IntSet *set, IntSetValue value) {
     return false;
   }
 
-  uint32_t index = findEntry(set->entries, set->states, set->capacity, value);
+  size_t index = findEntry(set->entries, set->states, set->capacity, value);
   return set->states[index] == valueState;
 }
 
@@ -78,7 +78,7 @@ bool setAddInt(IntSet *set, IntSetValue value) {
     adjustCapacity(set, capacity);
   }
 
-  uint32_t index = findEntry(set->entries, set->states, set->capacity, value);
+  size_t index = findEntry(set->entries, set->states, set->capacity, value);
 
   bool isNew = set->states[index] == emptyState;
   if (isNew) {
@@ -95,7 +95,7 @@ bool setDeleteInt(IntSet *set, IntSetValue value) {
     return false;
   }
 
-  uint32_t index = findEntry(set->entries, set->states, set->capacity, value);
+  size_t index = findEntry(set->entries, set->states, set->capacity, value);
   if (set->states[index] != valueState) {
     return false;
   }

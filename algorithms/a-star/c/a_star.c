@@ -151,7 +151,6 @@ void aStar() {
 #endif
   printf("\033[48;2;65;152;10m \033[0m: shortest path found\n");
 
-  int counter = 0;
   double timeStart = millis();
 
   LinkedList openList = {.head = NULL};
@@ -170,7 +169,6 @@ void aStar() {
 #ifdef DELAY
       Sleep(DELAY);
 #endif
-      counter++;
       PathNode *node = (PathNode*)neighbor->data;
       if (setContainsInt(&closedSet, node->id)) {
         continue;

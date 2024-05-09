@@ -4,8 +4,8 @@
 typedef void* ArrayValue;
 
 typedef struct {
-  int capacity;
-  int count;
+  size_t capacity;
+  size_t count;
   ArrayValue *values;
 } Array;
 

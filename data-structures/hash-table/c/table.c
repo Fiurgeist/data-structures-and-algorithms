@@ -15,7 +15,7 @@ void freeTable(Table *table) {
 
 static Entry* findEntry(Entry *entries, int capacity, String *key) {
   Entry *tombstone = NULL;
-  uint32_t index = key->hash & (capacity - 1);
+  size_t index = key->hash & (capacity - 1);
   for (;;) {
     Entry *entry = &entries[index];
     if (entry->key == NULL) {

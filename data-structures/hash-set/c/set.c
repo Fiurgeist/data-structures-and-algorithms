@@ -19,7 +19,7 @@ void freeSet(PtrSet *set) {
 
 static PtrSetValue* findEntry(PtrSetValue *values, int capacity, uint32_t value) {
   PtrSetValue *tombstone = NULL;
-  uint32_t index = value & (capacity - 1);
+  size_t index = value & (capacity - 1);
   for (;;) {
     PtrSetValue *entry = &values[index];
     if (entry->value == NULL) {

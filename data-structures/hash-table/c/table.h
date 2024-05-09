@@ -9,7 +9,7 @@
 #define TABLE_MAX_LOAD 0.75
 
 typedef struct {
-  int length;
+  uint32_t length;
   char *chars;
   uint32_t hash;
 } String;
@@ -22,8 +22,8 @@ typedef struct {
 } Entry;
 
 typedef struct {
-  int count;
-  int capacity;
+  size_t count;
+  size_t capacity;
   Entry *entries;
 } Table;
 

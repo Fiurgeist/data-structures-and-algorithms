@@ -11,8 +11,8 @@
 typedef uint32_t IntSetValue;
 
 typedef struct {
-  int count;
-  int capacity;
+  size_t count;
+  size_t capacity;
   IntSetValue *entries;
   char *states;
 } IntSet;

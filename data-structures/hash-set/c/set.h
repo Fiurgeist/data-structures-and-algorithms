@@ -13,8 +13,8 @@ typedef struct {
 } PtrSetValue;
 
 typedef struct {
-  int count;
-  int capacity;
+  size_t count;
+  size_t capacity;
   PtrSetValue *entries;
 } PtrSet;
 
