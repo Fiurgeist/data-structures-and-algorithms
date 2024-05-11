@@ -25,6 +25,7 @@ There's a lot of casting happening, usually to keep the collections generic for 
 
 **[Linked List](data-structures/linked-list/)**
 - C
+- Zig
 
 **[Dynamic Array](data-structures/array)**
 - C
