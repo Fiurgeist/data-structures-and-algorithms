@@ -8,22 +8,25 @@ There's a lot of casting happening, usually to keep the collections generic for 
 
 #### Algorithms
 
-**[A-Star](algorithms/a-star/readme.md)**
+**[A-Star](algorithms/a-star)**
 - C
 
 **Sorting**
-- **[Insertion](algorithms/sort/insertion/readme.md)**
+- **[Insertion](algorithms/sort/insertion)**
     - C
+
+**[TOTP: Time-Based One-Time Password Algorithm](algorithms/totp)**
+- Go
 
 #### Data Structures
 
-**[Hash Table](data-structures/hash-table/readme.md)**
+**[Hash Table](data-structures/hash-table)**
 - C
 
-**[Hash Set](data-structures/hash-set/readme.md)**
+**[Hash Set](data-structures/hash-set)**
 - C
 
-**[Linked List](data-structures/linked-list/)**
+**[Linked List](data-structures/linked-list)**
 - C
 - Zig
 

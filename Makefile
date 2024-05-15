@@ -11,9 +11,20 @@ run-c: build-c-debug
 test-zig:
 	zig build test
 
+.PHONY: install-go
+install-go:
+	go get ./...
+	go mod tidy
+
+.PHONY: run-go
+run-go:
+	go run -race $(file)
+
 .PHONY: help
 help:
 	@echo "Please use 'make <target>' where <target> is one of"
 	@echo "  build-c-debug           build C code"
-	@echo "  run-c                   run C code"
+	@echo "  run-c [folder=SOURCES]  run C code"
 	@echo "  test-zig                test Zig code"
+	@echo "  install-go              install Go dependencies"
+	@echo "  run-go [file=MAIN]      run Go code"
