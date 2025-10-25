@@ -33,3 +33,7 @@ There's a lot of casting happening, usually to keep the collections generic for 
 **[Dynamic Array](data-structures/array)**
 - C
 - Zig
+
+**[Gap Buffer](data-structures/gap-buffer)**
+- C
+
